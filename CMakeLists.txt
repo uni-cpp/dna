@@ -1,12 +1,21 @@
-cmake_minimum_required(VERSION 3.8)
+project( cog-dna )
 
-project(cognitiv-coding-challenge-dna)
+set( HEADERS
+    "base.hpp"
+    "person.hpp"
+    "sequence_buffer.hpp"
+)
 
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fconcepts")
+set( SOURCES
+)
 
-add_library(cogdna INTERFACE)
-target_include_directories(cogdna
-		INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
+add_library(cogdna INTERFACE
+    ${HEADERS}
+    ${SOURCES}
+)
 
-add_subdirectory(test)
+target_include_directories( cogdna INTERFACE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+)
+
+#add_subdirectory( test )
