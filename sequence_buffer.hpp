@@ -12,8 +12,8 @@ template < typename T >
 concept ByteBuffer = requires( T a )
 {
     {
-        static_cast< std::size_t >( a.size( ) )
-        } -> std::convertible_to< std::size_t >;
+        a.size( )
+        } -> std::same_as< std::size_t >;
     {
         a[ 0 ]
         } -> std::convertible_to< std::byte >;

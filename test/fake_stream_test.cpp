@@ -28,7 +28,9 @@ public:
             {
                 auto buf = chrom.read( );
                 if( buf.size( ) == 0 )
+                {
                     break;
+                }
                 writer_.get( ) << buf;
             }
 
@@ -83,7 +85,10 @@ fake_data( )
 {
     std::vector< std::byte > data( 1020 );
     for( int i = 0; i < 1020; i++ )
+    {
         data[ i ] = static_cast< std::byte >( rawdata[ i ] );
+    }
+
     return data;
 }
 

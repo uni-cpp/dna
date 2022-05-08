@@ -1,10 +1,11 @@
 #pragma once
 
+#include <sequence_buffer.hpp>
+
 #include <atomic>
 #include <cstddef>
 #include <string_view>
 #include <vector>
-#include <sequence_buffer.hpp>
 
 namespace detail
 {
@@ -12,6 +13,8 @@ namespace detail
 class binary_traits
 {
 public:
+    using char_type = std::byte;
+
     static constexpr std::byte
     to_upper( std::byte c ) noexcept
     {
@@ -29,14 +32,14 @@ public:
 
 class fake_stream
 {
-    std::vector< std::byte > data_;
-    std::size_t chunksize_;
-    std::atomic< long > offset_;
+    std::vector< std::byte > data_{ };
+    std::size_t chunksize_{ 1 };
+    std::atomic< long > offset_{ 0 };
 
 public:
     using byte_view = std::basic_string_view< std::byte, detail::binary_traits >;
 
-    fake_stream( );
+    fake_stream( ) = default;
     fake_stream( const fake_stream& other );
     fake_stream( fake_stream&& other ) noexcept;
     fake_stream( std::vector< std::byte > data, std::size_t chunksize );

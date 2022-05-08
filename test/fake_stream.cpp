@@ -1,12 +1,5 @@
 #include "fake_stream.hpp"
 
-fake_stream::fake_stream( )
-    : data_( 0 )
-    , chunksize_( 1 )
-    , offset_( 0 )
-{
-}
-
 fake_stream::fake_stream( const fake_stream& other )
     : data_( other.data_ )
     , chunksize_( other.chunksize_ )
@@ -68,9 +61,13 @@ fake_stream::read( )
     {
         auto len = std::min( chunksize_, data_.size( ) - offset_ );
         if( len == 0 )
+        {
             return byte_view( nullptr, 0 );
+        }
 
         if( offset_.compare_exchange_weak( offset, offset + len, std::memory_order_release ) )
+        {
             return byte_view( data_.data( ) + offset, len );
+        }
     }
 }
