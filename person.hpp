@@ -17,12 +17,10 @@ concept HelixStream = requires( T a )
         } -> std::convertible_to< std::size_t >;
 };
 
-template < HelixStream T >
+template < typename T >
 concept Person = requires( T a )
 {
-    {
-        a.chromosome( 1 )
-        } -> std::convertible_to< HelixStream >;
+    { a.chromosome( 1 ) };
     {
         a.chromosomes( )
         } -> std::convertible_to< std::size_t >;
