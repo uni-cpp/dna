@@ -1,7 +1,7 @@
 #include "catch.hpp"
 #include "fake_person.hpp"
 #include <iostream>
-#include <person.hpp>
+#include <dna/person.hpp>
 
 template < dna::Person P >
 class person_tester

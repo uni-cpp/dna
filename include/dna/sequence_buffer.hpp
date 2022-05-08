@@ -25,19 +25,15 @@ class sequence_buffer;
 template < ByteBuffer T >
 class sequence_buffer_iterator
 {
-    const sequence_buffer< T >* buf_;
-    std::size_t index_;
+    const sequence_buffer< T >* buf_{ nullptr };
+    std::size_t index_{ 0U };
 
 public:
     using iterator_category = std::bidirectional_iterator_tag;
     using value_type = base;
     using difference_type = long;
 
-    constexpr sequence_buffer_iterator( ) noexcept
-        : buf_( nullptr )
-        , index_( 0 )
-    {
-    }
+    constexpr sequence_buffer_iterator( ) noexcept = default;
 
     constexpr sequence_buffer_iterator( const sequence_buffer< T >* buffer, std::size_t index = 0 ) noexcept
         : buf_( buffer )
@@ -151,7 +147,9 @@ public:
         , size_( size )
     {
         if( size_ == 0 )
+        {
             size_ = static_cast< std::size_t >( buffer_.size( ) * packed_size::value );
+        }
     }
 
     constexpr base
@@ -206,7 +204,9 @@ constexpr typename sequence_buffer_iterator< T >::value_type
 sequence_buffer_iterator< T >::operator*( ) const
 {
     if( buf_ != nullptr )
+    {
         return buf_->at( index_ );
+    }
     return A;
 }
 
@@ -215,7 +215,9 @@ std::ostream&
 operator<<( std::ostream& os, const sequence_buffer< T >& buf )
 {
     for( auto i : buf )
+    {
         os << i;
+    }
     return os;
 }
 

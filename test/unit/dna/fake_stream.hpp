@@ -1,6 +1,6 @@
 #pragma once
 
-#include <sequence_buffer.hpp>
+#include <dna/sequence_buffer.hpp>
 
 #include <atomic>
 #include <cstddef>
