@@ -1,6 +1,6 @@
-#include "catch.hpp"
-#include "dna/sequence_buffer.hpp"
 #include <array>
+#include <catch2/catch.hpp>
+#include <dna/sequence_buffer.hpp>
 
 TEST_CASE( "Can use a Sequence Buffer", "[seqbuf]" )
 {

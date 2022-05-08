@@ -1,7 +1,6 @@
 project( cog-dna-unittests )
 
 set( HEADERS
-    "dna/catch.hpp"
     "dna/fake_person.hpp"
     "dna/fake_stream.hpp"
 )
@@ -29,6 +28,7 @@ target_include_directories( ${PROJECT_NAME}
 target_link_libraries( ${PROJECT_NAME}
     PRIVATE
         cog-dna
+        catch2
 )
 
 if( CODE_COVERAGE )

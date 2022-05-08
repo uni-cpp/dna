@@ -1,6 +1,6 @@
-#include "catch.hpp"
 #include "fake_person.hpp"
 #include <iostream>
+#include <catch2/catch.hpp>
 #include <dna/person.hpp>
 
 template < dna::Person P >
