@@ -1,14 +1,16 @@
 project( cog-dna-unittests )
 
 set( HEADERS
-    "dna/fake_person.hpp"
-    "dna/fake_stream.hpp"
 )
 
 set( SOURCES
     "dna/main.cpp"
 
+    "dna/fake_person.hpp"
+    "dna/fake_person.cpp"
+    "dna/fake_stream.hpp"
     "dna/fake_stream.cpp"
+
     "dna/fake_stream_test.cpp"
     "dna/sequence_buffer_test.cpp"
 )

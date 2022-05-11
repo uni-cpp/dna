@@ -9,9 +9,14 @@ set( HEADERS
 set( SOURCES
 )
 
+set( ADDITIONAL_FILES
+    "README.md"
+)
+
 add_library(cog-dna INTERFACE
     ${HEADERS}
     ${SOURCES}
+    ${ADDITIONAL_FILES}
 )
 
 target_include_directories( cog-dna

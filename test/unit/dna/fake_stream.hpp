@@ -15,14 +15,8 @@ class binary_traits
 public:
     using char_type = std::byte;
 
-    static constexpr std::byte
-    to_upper( std::byte c ) noexcept
-    {
-        return c;
-    }
-
     static std::size_t
-    length( const std::byte* )
+    length( const std::byte* /* len */ )
     {
         throw std::logic_error( "length of a binary string can't be determined. It must be explicitly supplied" );
     }
@@ -33,8 +27,8 @@ public:
 class fake_stream
 {
     std::vector< std::byte > data_{ };
-    std::size_t chunksize_{ 1 };
-    std::atomic< long > offset_{ 0 };
+    size_t chunk_size_{ 1U };
+    std::atomic< size_t > offset_{ 0U };
 
 public:
     using byte_view = std::basic_string_view< std::byte, detail::binary_traits >;
@@ -47,7 +41,7 @@ public:
     fake_stream& operator=( const fake_stream& other );
     fake_stream& operator=( fake_stream&& other ) noexcept;
 
-    void seek( long offset );
-    long size( ) const;
-    dna::sequence_buffer< byte_view > read( );
+    void seek( size_t offset );
+    [[nodiscard]] size_t size( ) const;
+    [[nodiscard]] dna::sequence_buffer< byte_view > read( );
 };

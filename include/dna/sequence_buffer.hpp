@@ -13,7 +13,7 @@ concept ByteBuffer = requires( T a )
 {
     {
         a.size( )
-        } -> std::same_as< std::size_t >;
+        } -> std::same_as< size_t >;
     {
         a[ 0 ]
         } -> std::convertible_to< std::byte >;
@@ -26,7 +26,7 @@ template < ByteBuffer T >
 class sequence_buffer_iterator
 {
     const sequence_buffer< T >* buf_{ nullptr };
-    std::size_t index_{ 0U };
+    size_t index_{ 0U };
 
 public:
     using iterator_category = std::bidirectional_iterator_tag;
@@ -35,7 +35,7 @@ public:
 
     constexpr sequence_buffer_iterator( ) noexcept = default;
 
-    constexpr sequence_buffer_iterator( const sequence_buffer< T >* buffer, std::size_t index = 0 ) noexcept
+    constexpr sequence_buffer_iterator( const sequence_buffer< T >* buffer, size_t index = 0 ) noexcept
         : buf_( buffer )
         , index_( index )
     {
@@ -50,8 +50,11 @@ public:
     constexpr sequence_buffer_iterator&
     operator=( const sequence_buffer_iterator& other ) noexcept
     {
-        buf_ = other.buf_;
-        index_ = other.index_;
+        if( this != &other )
+        {
+            buf_ = other.buf_;
+            index_ = other.index_;
+        }
 
         return *this;
     }
@@ -74,14 +77,14 @@ public:
     }
 
     constexpr sequence_buffer_iterator&
-    operator+=( std::size_t diff ) noexcept
+    operator+=( size_t diff ) noexcept
     {
         index_ += diff;
         return *this;
     }
 
     constexpr sequence_buffer_iterator
-    operator+( std::size_t diff ) const noexcept
+    operator+( size_t diff ) const noexcept
     {
         return sequence_buffer_iterator( buf_, index_ + diff );
     }
@@ -101,21 +104,21 @@ public:
         return result;
     }
 
-    constexpr long
+    constexpr int64_t
     operator-( const sequence_buffer_iterator& other ) const noexcept
     {
-        return static_cast< long >( index_ - other.index_ );
+        return static_cast< int64_t >( index_ - other.index_ );
     }
 
     constexpr sequence_buffer_iterator&
-    operator-=( std::size_t diff ) noexcept
+    operator-=( size_t diff ) noexcept
     {
         index_ -= diff;
         return *this;
     }
 
     constexpr sequence_buffer_iterator
-    operator-( std::size_t diff ) const noexcept
+    operator-( size_t diff ) const noexcept
     {
         return sequence_buffer_iterator( buf_, index_ - diff );
     }
@@ -137,37 +140,37 @@ template < ByteBuffer T >
 class sequence_buffer
 {
     T buffer_;
-    std::size_t size_;
+    size_t size_{ 0U };
 
 public:
     using iterator = sequence_buffer_iterator< T >;
 
-    constexpr sequence_buffer( T buffer, std::size_t size = 0 )
+    constexpr sequence_buffer( T buffer, size_t size = 0 )
         : buffer_( std::forward< T >( buffer ) )
         , size_( size )
     {
         if( size_ == 0 )
         {
-            size_ = static_cast< std::size_t >( buffer_.size( ) * packed_size::value );
+            size_ = static_cast< size_t >( buffer_.size( ) * packed_size::value );
         }
     }
 
     constexpr base
-    at( std::size_t index ) const
+    at( size_t index ) const
     {
-        auto boffset = index / packed_size::value;
-        auto tidx = index - ( boffset * packed_size::value );
+        auto byte_offset = index / packed_size::value;
+        auto tuple_idx = index - ( byte_offset * packed_size::value );
 
-        return unpack( buffer_[ boffset ] )[ tidx ];
+        return unpack( buffer_[ byte_offset ] )[ tuple_idx ];
     }
 
     constexpr base
-    operator[]( std::size_t index ) const
+    operator[]( size_t index ) const
     {
         return at( index );
     }
 
-    constexpr std::size_t
+    constexpr size_t
     size( ) const noexcept
     {
         return size_;

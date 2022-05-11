@@ -7,7 +7,7 @@
 namespace dna
 {
 
-enum class base
+enum class base : std::underlying_type_t< std::byte >
 {
     adenine,
     cytosine,

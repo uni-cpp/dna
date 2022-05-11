@@ -32,7 +32,9 @@ TEST_CASE( "Can use an iterator", "[seqbuf]" )
 
     std::vector< dna::base > bases;
     for( auto i : buf )
+    {
         bases.emplace_back( i );
+    }
 
     REQUIRE( bases[ 0 ] == dna::G );
     REQUIRE( bases[ 1 ] == dna::A );
