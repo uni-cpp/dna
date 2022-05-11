@@ -4,6 +4,11 @@
 #include <catch2/catch.hpp>
 #include <dna/person.hpp>
 
+#include <uni/common/Queue.hpp>
+
+#include <future>
+#include <map>
+
 template < dna::Person P >
 class person_tester
 {
@@ -121,15 +126,15 @@ fake_data( )
 TEST_CASE( "Fake stream is suitable for testing", "[stream]" )
 {
     auto data = fake_data( );
-    const size_t CHUNK_SIZE{ 128U };
-    fake_stream stream( std::move( data ), CHUNK_SIZE );
+    constexpr size_t CHUNK_SIZE_BYTES{ 128U };
+    fake_stream stream( std::move( data ), CHUNK_SIZE_BYTES );
 
     constexpr size_t RAWDATA_SIZE{ sizeof( rawdata ) / sizeof( rawdata[ 0 ] ) };
     REQUIRE( stream.size( ) == RAWDATA_SIZE );
     for( int i = 0; i < 7; i++ )
     {
         auto seq = stream.read( );
-        REQUIRE( seq.size( ) == ( CHUNK_SIZE * dna::packed_size::value ) );
+        REQUIRE( seq.size( ) == ( CHUNK_SIZE_BYTES * dna::packed_size::value ) );
         INFO( seq );
     }
 
@@ -185,4 +190,85 @@ TEST_CASE( "Validate chromosomes", "[stream]" )
         person_tester< fake_person > tester( std::cout, person );
         REQUIRE( !tester.validate_chromosomes( ) );
     }
+}
+
+TEST_CASE( "Person comparator", "[person]" )
+{
+    // Create 2 different persons
+    std::array< std::vector< std::byte >, 23 > data{ fake_data( ), fake_data( ), fake_data( ), fake_data( ), fake_data( ), fake_data( ), fake_data( ), fake_data( ),
+                                                     fake_data( ), fake_data( ), fake_data( ), fake_data( ), fake_data( ), fake_data( ), fake_data( ), fake_data( ),
+                                                     fake_data( ), fake_data( ), fake_data( ), fake_data( ), fake_data( ), fake_data( ), fake_data( ) };
+    fake_person person1( data );
+
+    data[ 1 ][ 1 ] = static_cast< std::byte >( 0xe4 );
+    fake_person person2( data );
+
+    // Lengths of all chromosomes should be equal
+
+    // [chrom #, base #] - key ; [val1, val2] - BASE Person 1 and base Person 2 values
+    using DiffContainer = std::map< std::pair< size_t, size_t >, std::pair< dna::base, dna::base > >;
+    uni::common::Queue< std::future< DiffContainer > > queue;
+
+    // Async task from main process with (Chromosome#, offset and two buffers) sent to the multithreaded queue
+    std::future< DiffContainer > future_person_comparator;
+    auto fill_diff = []( uni::common::Queue< std::future< DiffContainer > >& queue ) -> DiffContainer
+    {
+        DiffContainer retval;
+        std::future< DiffContainer > future;
+        while( uni::common::OperationStatus::CLOSED != queue.wait_pop( future ) )
+        {
+            auto result = future.get( );
+
+            // Merge into 1 map
+            retval.merge( result );
+
+            // Reset future
+            future = std::future< DiffContainer >{ };
+        }
+        return retval;
+    };
+
+    future_person_comparator = std::async( std::launch::async, std::move( fill_diff ), std::ref( queue ) );
+
+    // Fill the queue
+    for( size_t id_chrom{ 0U }; id_chrom < CHROMOSOMES_COUNT; ++id_chrom )
+    {
+        size_t offset = 0U;
+
+        auto& buffer1 = person1.chromosome( id_chrom );
+        auto& buffer2 = person2.chromosome( id_chrom );
+        REQUIRE( buffer1.size( ) == buffer2.size( ) );
+
+        while( true )
+        {
+            person1.chromosome( id_chrom ).seek( offset );
+
+            auto buf_read1 = buffer1.read( );
+            auto buf_read2 = buffer2.read( );
+
+            auto select_buffers_to_compare = [ id_chrom, offset, buf_read1, buf_read2 ]( ) -> DiffContainer
+            {
+                DiffContainer retval;
+                for( size_t idx{ 0 }; idx < buf_read1.size( ); ++idx )
+                {
+                    if( buf_read1[ idx ] != buf_read2[ idx ] )
+                    {
+                        // fill the map
+                        retval[ { id_chrom, offset * 4 + idx } ] = std::make_pair( buf_read1[ idx ], buf_read2[ idx ] );
+                    }
+                }
+
+                return retval;
+            };
+
+            auto future = std::async( std::launch::async, std::move( select_buffers_to_compare ) );
+            queue.push( std::move( future ) );
+        }
+    }
+
+    // Close queue -> future_person_comparator->get();
+    queue.close( );
+
+
+    const auto result = future_person_comparator.get( );
 }

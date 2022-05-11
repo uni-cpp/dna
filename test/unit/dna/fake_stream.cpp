@@ -47,7 +47,7 @@ fake_stream::operator=( fake_stream&& other ) noexcept
 }
 
 void
-fake_stream::seek( size_t offset )
+fake_stream::seek( size_t offset ) const
 {
     offset_.store( std::min( offset, data_.size( ) ) );
 }
@@ -59,7 +59,7 @@ fake_stream::size( ) const
 }
 
 dna::sequence_buffer< fake_stream::byte_view >
-fake_stream::read( )
+fake_stream::read( ) const
 {
     auto offset = offset_.load( std::memory_order_consume );
     while( true )

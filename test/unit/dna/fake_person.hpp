@@ -47,30 +47,6 @@ constexpr std::array< size_t, ALL_CHROMOSOMES.size( ) > BASE_PAIRS = { 247199719
 constexpr size_t CHROMOSOMES_COUNT{ 23U };
 constexpr size_t SEX_CHROMOSOME_INDEX{ 22U };
 
-// Started from 0 (based on existing test)
-// constexpr size_t
-// get_chromosome_index( Chromosome chrom )
-//{
-//    if( chrom == Chromosome::CHROMOSOME_23_Y )
-//    {
-//        return static_cast< size_t >( Chromosome::CHROMOSOME_23_X );
-//    }
-
-//    return static_cast< size_t >( chrom );
-//}
-
-// constexpr size_t
-// get_chromosome_size( Chromosome chrom )
-//{
-//     return BASE_PAIRS[ static_cast< size_t >( chrom ) ];
-// }
-
-// constexpr bool
-// is_sex_chromosome( Chromosome chrom )
-//{
-//     return chrom == Chromosome::CHROMOSOME_23_X || chrom == Chromosome::CHROMOSOME_23_Y;
-// }
-
 constexpr size_t DEFAULT_CHUNK_SIZE{ 512U };
 
 class fake_person

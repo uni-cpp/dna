@@ -28,7 +28,7 @@ class fake_stream
 {
     std::vector< std::byte > data_{ };
     size_t chunk_size_{ 1U };
-    std::atomic< size_t > offset_{ 0U };
+    mutable std::atomic< size_t > offset_{ 0U };
 
 public:
     using byte_view = std::basic_string_view< std::byte, detail::binary_traits >;
@@ -41,7 +41,7 @@ public:
     fake_stream& operator=( const fake_stream& other );
     fake_stream& operator=( fake_stream&& other ) noexcept;
 
-    void seek( size_t offset );
+    void seek( size_t offset ) const;
     [[nodiscard]] size_t size( ) const;
-    [[nodiscard]] dna::sequence_buffer< byte_view > read( );
+    [[nodiscard]] dna::sequence_buffer< byte_view > read( ) const;
 };
