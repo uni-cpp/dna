@@ -207,10 +207,10 @@ TEST_CASE( "Person comparator", "[person]" )
 
     // [chrom #, base #] - key ; [val1, val2] - BASE Person 1 and base Person 2 values
     using DiffContainer = std::map< std::pair< size_t, size_t >, std::pair< dna::base, dna::base > >;
+
     uni::common::Queue< std::future< DiffContainer > > queue;
 
     // Async task from main process with (Chromosome#, offset and two buffers) sent to the multithreaded queue
-    std::future< DiffContainer > future_person_comparator;
     auto fill_diff = []( uni::common::Queue< std::future< DiffContainer > >& queue ) -> DiffContainer
     {
         DiffContainer retval;
@@ -228,15 +228,15 @@ TEST_CASE( "Person comparator", "[person]" )
         return retval;
     };
 
-    future_person_comparator = std::async( std::launch::async, std::move( fill_diff ), std::ref( queue ) );
+    std::future< DiffContainer > future_person_comparator = std::async( std::launch::async, std::move( fill_diff ), std::ref( queue ) );
 
     // Fill the queue
     for( size_t id_chrom{ 0U }; id_chrom < CHROMOSOMES_COUNT; ++id_chrom )
     {
         size_t offset = 0U;
 
-        auto& buffer1 = person1.chromosome( id_chrom );
-        auto& buffer2 = person2.chromosome( id_chrom );
+        const auto& buffer1 = person1.chromosome( id_chrom );
+        const auto& buffer2 = person2.chromosome( id_chrom );
         REQUIRE( buffer1.size( ) == buffer2.size( ) );
 
         while( true )
@@ -245,6 +245,12 @@ TEST_CASE( "Person comparator", "[person]" )
 
             auto buf_read1 = buffer1.read( );
             auto buf_read2 = buffer2.read( );
+
+            // Check second buffer
+            if( 0 == buf_read1.size( ) || 0 == buf_read2.size( ) )
+            {
+                break;
+            }
 
             auto select_buffers_to_compare = [ id_chrom, offset, buf_read1, buf_read2 ]( ) -> DiffContainer
             {
@@ -263,6 +269,7 @@ TEST_CASE( "Person comparator", "[person]" )
 
             auto future = std::async( std::launch::async, std::move( select_buffers_to_compare ) );
             queue.push( std::move( future ) );
+            offset += buf_read1.size( );
         }
     }
 
@@ -271,4 +278,7 @@ TEST_CASE( "Person comparator", "[person]" )
 
 
     const auto result = future_person_comparator.get( );
+    REQUIRE( result.size( ) == 2U );
+    REQUIRE( result.at( std::make_pair< size_t, size_t >( 1, 6 ) ) == std::make_pair< dna::base, dna::base >( dna::base::adenine, dna::base::cytosine ) );
+    REQUIRE( result.at( std::make_pair< size_t, size_t >( 1, 7 ) ) == std::make_pair< dna::base, dna::base >( dna::base::thymine, dna::base::adenine ) );
 }
