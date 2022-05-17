@@ -124,7 +124,7 @@ public:
     }
 
     constexpr bool
-    operator==( const sequence_buffer_iterator& other ) noexcept
+    operator==( const sequence_buffer_iterator& other ) const noexcept
     {
         return buf_ == other.buf_ && index_ == other.index_;
     }

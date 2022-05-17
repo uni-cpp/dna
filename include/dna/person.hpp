@@ -9,9 +9,7 @@ template < typename T >
 concept HelixStream = requires( T a )
 {
     { a.seek( 1000L ) };
-    {
-        a.read( )
-        } -> std::convertible_to< sequence_buffer< ByteBuffer > >;
+    { a.read( ) };  // -> std::convertible_to < sequence_buffer< ByteBuffer >;
     {
         a.size( )
         } -> std::convertible_to< std::size_t >;
@@ -20,7 +18,7 @@ concept HelixStream = requires( T a )
 template < typename T >
 concept Person = requires( T a )
 {
-    { a.chromosome( 1U ) };  // std::convertible_to<HelixStream>
+    { a.chromosome( 1U ) };  // -> std::convertible_to< HelixStream >
     {
         a.chromosomes( )
         } -> std::convertible_to< std::size_t >;
