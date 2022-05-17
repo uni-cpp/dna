@@ -13,6 +13,8 @@ set( ADDITIONAL_FILES
     "README.md"
 )
 
+treat_all_warnings_as_errors()
+
 add_library(cog-dna INTERFACE
     ${HEADERS}
     ${SOURCES}
