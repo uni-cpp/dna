@@ -15,13 +15,14 @@ set( ADDITIONAL_FILES
 
 treat_all_warnings_as_errors()
 
-add_library(cog-dna INTERFACE
-    ${HEADERS}
-    ${SOURCES}
-    ${ADDITIONAL_FILES}
+add_library( ${PROJECT_NAME}
+    INTERFACE
+        ${HEADERS}
+        ${SOURCES}
+        ${ADDITIONAL_FILES}
 )
 
-target_include_directories( cog-dna
+target_include_directories( ${PROJECT_NAME}
     INTERFACE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 )
